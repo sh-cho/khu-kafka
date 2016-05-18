@@ -1,2 +1,2 @@
 # khu-kafka
-파일처리 5조 Message broker 프로젝트
+파일처리 4조 Message broker 프로젝트
