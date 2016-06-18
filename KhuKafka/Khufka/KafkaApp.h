@@ -25,4 +25,9 @@ public:
 public:
 	void run();
 	void configuration();
+	void produceMessage();
+
+//static
+public:
+	//static int Hash(string key, );
 };

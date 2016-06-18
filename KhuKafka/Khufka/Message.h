@@ -1,5 +1,5 @@
 /**
- *	
+ *	Message
  */
 #pragma once
 #include <string>
