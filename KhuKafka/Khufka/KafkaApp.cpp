@@ -1,5 +1,7 @@
 #include "KafkaApp.h"
 
+string KafkaApp::hashTable[100] = { "" };
+
 KafkaApp::KafkaApp()
 {
 }
@@ -15,4 +17,3 @@ void KafkaApp::run()
 		
 	}
 }
-

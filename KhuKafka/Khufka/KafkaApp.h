@@ -14,7 +14,7 @@ using namespace std;
 class KafkaApp
 {
 	//vector<Producer> producerList;
-	Broker messageBroker;
+	//Broker messageBroker;
 	//vector<Consumer> consumerList;
 	//topic hashtable
 
@@ -29,5 +29,19 @@ public:
 
 //static
 public:
-	//static int Hash(string key, );
+	/**
+	*	비어있는거 -> ""
+	*	Tombstone -> "R.I.P"
+	*/
+	static string hashTable[100];
+	static int getAddrInHashTable(string key)
+	{
+		int arr = std::hash<std::string>{}(key);
+		arr %= 100;
+
+		if (hashTable[arr] == "")
+			hashTable[arr] = key;
+
+		return 0;
+	}
 };
