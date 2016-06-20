@@ -149,11 +149,13 @@
     <ClCompile Include="FixedFileBuffer.cpp" />
     <ClCompile Include="KafkaApp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TopicHash.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FixedFileBuffer.h" />
     <ClInclude Include="KafkaApp.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="TopicHash.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

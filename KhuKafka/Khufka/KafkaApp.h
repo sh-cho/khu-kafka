@@ -18,8 +18,6 @@ class KafkaApp
 {
 	//vector<Producer> producerList;
 	//Broker messageBroker;
-	//vector<Consumer> consumerList;
-	//topic hashtable
 
 //Constructor, Destructor
 public:
@@ -29,6 +27,7 @@ public:
 //Method
 public:
 	void run();
+	
 
 //static method
 public:
@@ -36,15 +35,10 @@ public:
 	 *	비어있는거 -> ""
 	 *	Tombstone -> "RIP"
 	 */
+
+	static int hashRecord[2];
+	static FixedFileBuffer hashBuffer;
+
 	static string hashTable[100];
-	static int getAddrInHashTable(string key)
-	{
-		int arr = std::hash<std::string>{}(key);
-		arr %= 100;
-
-		if (hashTable[arr] == "")
-			hashTable[arr] = key;
-
-		return 0;
-	}
+	static int getAddrInHashTable(string key);
 };

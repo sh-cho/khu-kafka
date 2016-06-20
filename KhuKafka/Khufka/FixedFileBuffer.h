@@ -1,8 +1,12 @@
 #pragma once
 #include <fstream>
+#include <memory>
 #include "Message.h"
+#include "TopicHash.h"
 
-#define T Message
+
+#define T TopicHash
+
 class FixedFileBuffer
 {
 public:
@@ -14,10 +18,11 @@ public:
 
 	std::fstream file;
 	
-	void Open(char* name);
-
+	void Open(char* name,int mode = 0);
+	int Update(T _item, int startPoint = 0);
 	void Insert(T _item);
-	void get(T& _item);
+	//bool get(T& _item);
+	int get(T& _item,int startPoint = 0);
 
 };
 

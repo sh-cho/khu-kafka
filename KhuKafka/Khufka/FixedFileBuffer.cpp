@@ -17,34 +17,141 @@ FixedFileBuffer::FixedFileBuffer(int * _FieldSize, int _arrSize)
 
 FixedFileBuffer::~FixedFileBuffer()
 {
+	file.close();
+	delete[] Buffer;
 }
 
-void FixedFileBuffer::Open(char * name)
+void FixedFileBuffer::Open(char * name,int mode)
 {
-	file.open(name, ios::out | ios::in | ios::app | ios::binary);
+	
+	fstream out(name, ios::out | ios::app);
+	out.close();
+
+	if (mode == 0)
+		file.open(name, ios::out | ios::in | ios::binary | ios::ate);
+	else
+		file.open(name, mode);
+
+	file.clear();
+}
+
+int FixedFileBuffer::Update(T _item, int startPoint)
+{
+	file.clear();
+
+	int count = 0;
+	US key = _item.Key();
+
+	//무조건 첫번째거 get ?
+	if (startPoint == 0)
+	{
+		file.seekg(ios::beg);
+		file.seekp(ios::beg);
+	}
+	else
+	{
+		file.seekg(startPoint, ios::beg);
+		file.seekp(startPoint, ios::beg);
+	}
+
+	while (!file.eof())
+	{
+		count += bufferSize;
+		char* getBuffer;
+		getBuffer = new char[bufferSize];
+		memset(getBuffer, 0, bufferSize);
+		file.read(getBuffer, bufferSize);
+
+		if (getBuffer[0] == true)	//isDeleted
+		{
+			delete[] getBuffer;
+			continue;
+		}
+		T item;
+		item.Unpack(getBuffer);
+
+		if (item.Key() == key)
+		{
+			_item.Pack(Buffer);
+			//char isd[1];
+			//isd[0] = '1';
+			char isd = 1;
+			file.seekg(-bufferSize + 1, ios::cur);
+			file.write(Buffer, bufferSize);
+
+			delete[] getBuffer;
+			return count;
+		}
+
+		delete[] getBuffer;
+
+	}
+	return -1;
+
 }
 
 void FixedFileBuffer::Insert(T _item)
 {
-	_item.Unpack(Buffer);
+	///_item.Unpack(Buffer);
+	_item.Pack(Buffer);	//성현
 	file.write(Buffer, bufferSize);
 	memset(Buffer, 0, bufferSize);
 	return;
 }
 
-void FixedFileBuffer::get(T & _item)
+int FixedFileBuffer::get(T & _item, int startPoint)
 {
+	file.clear();
+
+	int count = 0;
 	US key = _item.Key();
 
-	file.seekg(ios::beg);
-	while (1)
+	//무조건 첫번째거 get ?
+	if (startPoint == 0)
 	{
+		file.seekg(ios::beg);
+		file.seekp(ios::beg);
+	}
+	else
+	{
+		file.seekg(startPoint, ios::beg);
+		file.seekp(startPoint, ios::beg);
+	}
+
+	while (!file.eof())
+	{
+		count += bufferSize;
 		char* getBuffer;
-		file.read(getBuffer,bufferSize);
+		getBuffer = new char[bufferSize];
+		memset(getBuffer, 0, bufferSize);
+		file.read(getBuffer, bufferSize);
+	
+		if (getBuffer[0] == true)	//isDeleted
+		{
+			delete[] getBuffer;
+			continue;
+		}
+		T item;
+		item.Unpack(getBuffer);
 		
-		T item(getBuffer);
+		if (item.Key() == key)
+		{
+			
+			_item = item;
+			
+			//char isd[1];
+			//isd[0] = '1';
+			char isd = 1;
+			file.seekg(-bufferSize,ios::cur);
+			file.write(&isd, 1);
+
+			delete[] getBuffer;
+			return count;
+		}
+
+		delete[] getBuffer;
 
 	}
 
-	T.Pack(Buffer);
+	return -1;
 }
