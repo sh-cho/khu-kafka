@@ -1,5 +1,8 @@
 #pragma once
+#include <iostream>
 #include <vector>
+#include "Message.h"
+#include "FixedFileBuffer.h"
 class Producer;
 class Broker;
 class Consumer;
@@ -18,21 +21,21 @@ class KafkaApp
 	//vector<Consumer> consumerList;
 	//topic hashtable
 
+//Constructor, Destructor
 public:
 	KafkaApp();
 	~KafkaApp();
 
+//Method
 public:
 	void run();
-	void configuration();
-	void produceMessage();
 
-//static
+//static method
 public:
 	/**
-	*	비어있는거 -> ""
-	*	Tombstone -> "R.I.P"
-	*/
+	 *	비어있는거 -> ""
+	 *	Tombstone -> "RIP"
+	 */
 	static string hashTable[100];
 	static int getAddrInHashTable(string key)
 	{

@@ -146,10 +146,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FixedFileBuffer.cpp" />
     <ClCompile Include="KafkaApp.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FixedFileBuffer.h" />
     <ClInclude Include="KafkaApp.h" />
     <ClInclude Include="Message.h" />
   </ItemGroup>
