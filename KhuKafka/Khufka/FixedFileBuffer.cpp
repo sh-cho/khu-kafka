@@ -40,7 +40,7 @@ int FixedFileBuffer::Update(T _item, int startPoint)
 	file.clear();
 
 	int count = 0;
-	US key = _item.Key();
+	USHORT key = _item.Key();
 
 	//무조건 첫번째거 get ?
 	if (startPoint == 0)
@@ -99,12 +99,12 @@ void FixedFileBuffer::Insert(T _item)
 	return;
 }
 
-int FixedFileBuffer::get(T & _item, int startPoint)
+int FixedFileBuffer::get(T & _item, int startPoint, bool isGetAndDel)
 {
 	file.clear();
 
 	int count = 0;
-	US key = _item.Key();
+	USHORT key = _item.Key();
 
 	//무조건 첫번째거 get ?
 	if (startPoint == 0)
@@ -141,9 +141,12 @@ int FixedFileBuffer::get(T & _item, int startPoint)
 			
 			//char isd[1];
 			//isd[0] = '1';
-			char isd = 1;
-			file.seekg(-bufferSize,ios::cur);
-			file.write(&isd, 1);
+			if (isGetAndDel)
+			{
+				char isd = 1;
+				file.seekg(-bufferSize, ios::cur);
+				file.write(&isd, 1);
+			}
 
 			delete[] getBuffer;
 			return count;

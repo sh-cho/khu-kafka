@@ -22,7 +22,7 @@ void TopicHash::Pack(char * buffer)
 
 }
 
-US TopicHash::Key()
+USHORT TopicHash::Key()
 {
 	return topicId;
 }

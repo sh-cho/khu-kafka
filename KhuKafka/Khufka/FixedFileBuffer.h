@@ -22,7 +22,7 @@ public:
 	int Update(T _item, int startPoint = 0);
 	void Insert(T _item);
 	//bool get(T& _item);
-	int get(T& _item,int startPoint = 0);
+	int get(T& _item,int startPoint = 0, bool isGetAndDel = true);
 
 };
 

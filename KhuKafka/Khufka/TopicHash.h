@@ -2,16 +2,16 @@
 #include <string>
 using namespace std;
 
-typedef unsigned short US;
+typedef unsigned short USHORT;
 class TopicHash
 {
 public:
-	US topicId;
+	USHORT topicId;
 	string topicName;
 	
 	void Unpack(char* buffer);
 	void Pack(char* buffer);
-	US Key();
+	USHORT Key();
 
 
 };

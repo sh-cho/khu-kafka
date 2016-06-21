@@ -6,25 +6,25 @@
 #include <chrono>
 using namespace std;
 
-typedef unsigned short US;
+typedef unsigned short USHORT;
 
 struct Message
 {
-	US topic;
+	USHORT topic;
 	chrono::system_clock::time_point timeStamp;
 	string content;
 
-	Message(int _topic = 0, string _content = "");
+	Message(USHORT _topic = 0, string _content = "");
 	Message(char* buffer);
 	~Message();
 	void Unpack(char* buffer);
 	void Pack(char* buffer);
-	US Key();
+	USHORT Key();
 };
 
 
 /////////////////////////////////////////////////////////////////////////
-inline Message::Message(int _topic, string _content)
+inline Message::Message(USHORT _topic, string _content)
 	:topic(_topic), content(_content)
 {
 	//메시지 타임스탬프 초기화 -> 메시지 만들어진 시간
@@ -66,7 +66,7 @@ inline void Message::Pack(char * buffer)
 }
 
 
-inline US Message::Key()
+inline USHORT Message::Key()
 {
 	return topic;
 }

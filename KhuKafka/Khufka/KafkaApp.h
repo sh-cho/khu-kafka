@@ -3,9 +3,7 @@
 #include <vector>
 #include "Message.h"
 #include "FixedFileBuffer.h"
-class Producer;
-class Broker;
-class Consumer;
+#include "Producer.h"
 using namespace std;
 
 /**
@@ -16,9 +14,8 @@ using namespace std;
  */
 class KafkaApp
 {
-	//vector<Producer> producerList;
-	//Broker messageBroker;
-
+	vector<Producer> producerList;
+	
 //Constructor, Destructor
 public:
 	KafkaApp();
@@ -27,7 +24,9 @@ public:
 //Method
 public:
 	void run();
-	
+	void addMessage();
+	void requestMsgByTopic();
+	void requestMsgByProdID();
 
 //static method
 public:
@@ -35,10 +34,9 @@ public:
 	 *	비어있는거 -> ""
 	 *	Tombstone -> "RIP"
 	 */
-
 	static int hashRecord[2];
 	static FixedFileBuffer hashBuffer;
 
-	static string hashTable[100];
+	//static string hashTable[100];
 	static int getAddrInHashTable(string key);
 };
