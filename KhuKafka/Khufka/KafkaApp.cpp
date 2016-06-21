@@ -3,7 +3,8 @@
 
 ///string KafkaApp::hashTable[100] = { "" };
 int KafkaApp::hashRecord[2] = { 2,18 };
-FixedFileBuffer KafkaApp::hashBuffer(hashRecord, 2);
+FixedFileBuffer<TopicHash> KafkaApp::hashBuffer(hashRecord, 2);
+int prodFieldSize[1] = {2};
 
 ////////////////////////////////////////////////////////////////////
 // Private member function
@@ -12,11 +13,13 @@ FixedFileBuffer KafkaApp::hashBuffer(hashRecord, 2);
 ////////////////////////////////////////////////////////////////////
 // Constructor, Destructor
 KafkaApp::KafkaApp()
+	//:prodBuffer(prodFieldSize, 1)
 {
 	hashBuffer.Open("TopicTable.hash", ios::out | ios::in | ios::binary);
+	//prodBuffer.Open("ProducerList.bin", ios::out | ios::in | ios::binary);
+	prodList.open("ProducerList.txt", ios::in);
 
-
-	
+	recoveryCheck();
 }
 
 KafkaApp::~KafkaApp()
@@ -59,6 +62,7 @@ void KafkaApp::run()
 		cout << "2. Consumer: 메시지 요청(by Topic)" << endl;
 		cout << "3. Consumer: 메시지 요청(by ProudcerID)" << endl;
 		cout << "4. HashTable 확인" << endl;
+		cout << "5. Kafka 종료" << endl;
 		cout << "> ";
 		cin >> input;
 
@@ -73,7 +77,7 @@ void KafkaApp::run()
 			break;
 
 		case 3:
-			requestMsgByProdID();
+			printRequestMsgByProdID();
 			break;
 
 		case 4:
@@ -82,9 +86,13 @@ void KafkaApp::run()
 			cout << "topic 국정원: " << getAddrInHashTable("국정원") << endl;
 			break;
 
+		case 5:
+			cout << "Exit" << endl;
+			exit(1);
+
 		default:
-			cout << "종료합니다" << endl;
-			return;
+			//cout << "종료합니다" << endl;
+			continue;
 		}
 
 		system("pause");
@@ -123,32 +131,158 @@ void KafkaApp::addMessage()
 	topicID = getAddrInHashTable(string(topic));	//해시테이블 추가
 	Message msg(topicID, content);
 
+	prodList.seekg(ios::beg);
+	while (!prodList.eof())
+	{
+		int id;
+		prodList >> id;
 
+		if (id == prodID)
+		{
+			Producer pro(id);
+			pro.addMessage(msg);
+			return;
+		}
+
+	}
+
+	prodList.close();
+	fstream savePro;
+	savePro.open("ProducerList.txt", ios::out | ios::app);
+	savePro << '\t' << prodID;
+	Producer pro(prodID);
+	pro.addMessage(msg);
+
+	prodList.open("ProducerList.txt", ios::in);
 	//메시지 추가 로직
 	//if Producer가 존재하지 않으면
 	//	Producer 생성 뒤 메시지 추가
 	//else //producer 존재
 	//	Producer file에 append
-	for (Producer& producer : producerList)
-	{
-		if (producer.id == prodID)
-		{
-			//producer에 새 메시지 추가
-			
-		}
-	}
+	//
+	//for (Producer& producer : producerList)
+	//{
+	//	if (producer.id == prodID)
+	//	{
+	//		//producer에 새 메시지 추가
+	//		producer.addMessage(msg);
+	//		return;
+	//	}
+	//}
 
-	//not found
-	Producer newprod(prodID);
-	producerList.push_back(newprod);
+	//while (1)
+	//{
+	//	Producer prod;
+	//	if (prodBuffer.Read(prod) != -1)	//read==-1 -> eof
+	//	{
+	//		
+	//	}
+	//}
+
+	////not found
+	////Producer newprod(prodID);
+	//producerList.push_back(Producer(prodID));
+	//
+	////메시지추가
+	//producerList[producerList.size() - 1].addMessage(msg);
+
+
 }
 
 void KafkaApp::requestMsgByTopic()
 {
+	system("cls");
+
+	string topic;
+	//memset(topic, 0, 17);
+
+	cout << "Find topic: ";
+	cin >> topic;
+
+	int topicID = getAddrInHashTable(topic);
+
+	vector<Message> messageVec = requestMsgByTopic(topicID);
+
+	for (auto i : messageVec)
+	{
+		cout << i.topic << ":" << i.content << ":" << i.content << endl;
+	}
 }
 
-void KafkaApp::requestMsgByProdID()
+vector<Message> KafkaApp::requestMsgByTopic(int to)
 {
+	//이거 반복
+	
+	vector<Message> messageVec;
+	Message getMessage;
+	while (!prodList.eof())
+	{
+		int id;
+		prodList >> id;
+		Producer pro(id);
+		getMessage.topic = to;
+		int startPos = 0;
+		while (startPos = pro.fileBuffer.get(getMessage, startPos))
+		{
+			if (startPos == -1)
+				break;
+			else
+			{
+				messageVec.push_back(getMessage);
+			}
+		}
+		
+	}
+
+	return messageVec;
+	
+}
+
+void KafkaApp::printRequestMsgByProdID()
+{
+	system("cls");
+
+	int prodID;
+
+	cout << "Find Producer ID: ";
+	cin >> prodID;
+
+	vector<Message> messageVec = requestMsgByProdID(prodID);
+
+	for (auto i : messageVec)
+	{
+		cout << i.topic << ":" << i.content << ":" << i.content << endl;
+	}
+	
+
+}
+
+vector<Message> KafkaApp::requestMsgByProdID(int prodID)
+{
+		
+	vector<Message> messageVec;
+	Message getMessage;
+
+
+	Producer pro(prodID);
+	int startPos = 0;
+	while (startPos = pro.fileBuffer.Read(getMessage, startPos))
+	{
+		if (startPos == -1)
+			break;
+		else
+		{
+			messageVec.push_back(getMessage);
+		}
+	}
+
+	return messageVec;
+}
+
+
+void KafkaApp::recoveryCheck()
+{
+	//
 }
 
 int KafkaApp::getAddrInHashTable(string key)
@@ -164,11 +298,11 @@ int KafkaApp::getAddrInHashTable(string key)
 		///hashTable[arr] = key;
 
 		TopicHash th;
-		th.topicId = arr;
+		th.topicId = arr  +1 ;
 		th.topicName = key;
 
 		hashBuffer.Update(th);
-		return arr;
+		return arr + 1;
 	}
 	else
 	{
@@ -187,12 +321,12 @@ int KafkaApp::getAddrInHashTable(string key)
 				///hashTable[curr] = key;
 
 				TopicHash th;
-				th.topicId = curr;
+				th.topicId = curr + 1;
 				th.topicName = key;
 
 				hashBuffer.Update(th);
 
-				return curr;
+				return curr + 1;
 			}
 
 			curr = ((curr + 1) % 100);

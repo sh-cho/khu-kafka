@@ -14,7 +14,9 @@ using namespace std;
  */
 class KafkaApp
 {
-	vector<Producer> producerList;
+	//FixedFileBuffer<Producer> prodBuffer;
+	fstream prodList;
+	//vector<Producer> producerList;
 	
 //Constructor, Destructor
 public:
@@ -26,7 +28,10 @@ public:
 	void run();
 	void addMessage();
 	void requestMsgByTopic();
-	void requestMsgByProdID();
+	vector<Message> requestMsgByTopic(int to);
+	vector<Message> requestMsgByProdID(int prodID);
+	void printRequestMsgByProdID();
+	void recoveryCheck();	//producerList 확인 후 복구
 
 //static method
 public:
@@ -35,7 +40,7 @@ public:
 	 *	Tombstone -> "RIP"
 	 */
 	static int hashRecord[2];
-	static FixedFileBuffer hashBuffer;
+	static FixedFileBuffer<TopicHash> hashBuffer;
 
 	//static string hashTable[100];
 	static int getAddrInHashTable(string key);
